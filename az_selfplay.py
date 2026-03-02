@@ -30,6 +30,7 @@ def choose_action(pi: np.ndarray, tau: float) -> int:
 
 def play_one_game(net: AZNet, device: str, sims: int = 400, c_puct: float = 1.25) -> List[Sample]:
     env = make_env()
+    env.reset()
     mcts = AlphaZeroMCTS(net, device=device, c_puct=c_puct)
 
     history: List[Tuple[np.ndarray, np.ndarray, int]] = []  # (obs, pi, player_id)
