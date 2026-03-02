@@ -14,6 +14,9 @@ import copy
 import gym
 import gym_togyzkumalak  # registers env
 
+def base_env(env):
+    return env.unwrapped if hasattr(env, "unwrapped") else env
+
 def make_env():
     env = gym.make("Togyzkumalak-v0")
     env.reset()          # обязательно инициализировать board
