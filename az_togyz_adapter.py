@@ -28,21 +28,17 @@ def player_to_move(env) -> int:
     return 0 if b.run.name == "white" else 1
 
 def legal_mask(env) -> np.ndarray:
-    mask = np.array(env.available_action(), dtype=np.float32)
-    if mask.shape != (9,):
-        mask = mask.reshape(9,)
+    e = base_env(env)
+    mask = np.array(e.available_action(), dtype=np.float32).reshape(9,)
     return mask
 
 def canonical_obs(env) -> np.ndarray:
-    """
-    Convert env observation to canonical: player-to-move features first.
-    Original encoding: [white63, black63, turn2].
-    If black to move, we swap halves and flip turn bits to [1,0].
-    """
-    obs = env.observation()
+    e = base_env(env)
+    obs = e.observation()
     obs = np.asarray(obs, dtype=np.float32).reshape(-1)
     if obs.shape[0] != 128:
         raise ValueError(f"Expected 128 obs, got {obs.shape}")
+
     turn = obs[-2:]
     is_black = (turn[0] < 0.5 and turn[1] > 0.5)
     if is_black:
@@ -52,7 +48,6 @@ def canonical_obs(env) -> np.ndarray:
         obs[63:126] = a
         obs[-2] = 1.0
         obs[-1] = 0.0
-    # else already canonical with turn=[1,0]
     return obs
 
 def state_key(env) -> bytes:
@@ -65,7 +60,8 @@ def state_key(env) -> bytes:
     return o.tobytes() + bytes([p])
 
 def step_env(env, action: int):
-    _, r, done, _info = env.step(action)
+    e = base_env(env)  # <- снимаем OrderEnforcing
+    _, r, done, _info = e.step(action)
     return float(r), bool(done)
 
 def clone_env(env):
