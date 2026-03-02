@@ -15,7 +15,9 @@ import gym
 import gym_togyzkumalak  # registers env
 
 def make_env():
-    return gym.make("Togyzkumalak-v0")
+    env = gym.make("Togyzkumalak-v0")
+    env.reset()          # обязательно инициализировать board
+    return env.unwrapped # убрать OrderEnforcing/EnvChecker wrappers
 
 def player_to_move(env) -> int:
     # 0 = white, 1 = black
